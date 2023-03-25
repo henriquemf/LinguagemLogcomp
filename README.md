@@ -20,7 +20,7 @@ O objetivo desse projeto é criar uma linguagem própria, com um uso específico
 ## EBNF da Linguagem:
 
 ```lua
-PROGRAM = STRUCTURE, { STATEMENT };
+PROGRAM = "Hollownest is infected", VARIABLES_DECLARATION,{ STATEMENT }, "You became the void";
 
 STATEMENT = ( CONDITIONAL | VARIABLES | FUNCTION );
 
@@ -28,22 +28,22 @@ GAME_LOOP = "using soul", { STATEMENT }, "end using soul";
 
 CONDITIONAL = "full soul", DAMAGE_CAUSING_CONDITION, "empty soul";
 
-VARIABLES_DECLARATION = "souls to be sacrificed", { TYPED_VARIABLE }, "they became the void";
+VARIABLES_DECLARATION = "souls to be sacrificed", { VARIABLES }, "they became the void";
 
-FUNCTION = "interaction", IDENTIFIER, "entities", [ TYPED_VARIABLE, { ",", TYPED_VARIABLE } ], "pure vessel", { STATEMENT }, "sealed vessel";
+FUNCTION = "interaction", IDENTIFIER, "entities", [ IDENTIFIER, { ",", IDENTIFIER } ], "pure vessel", { STATEMENT }, "sealed vessel";
 
-VARIABLES = TYPED_VARIABLE, "lives as", IDENTIFIER;
+VARIABLES = DATA_TYPE, ":", IDENTIFIER, "lives as", IDENTIFIER;
 
-ACTION = "action", IDENTIFIER, "with souls being", "(", [ TYPED_VARIABLE, { ",", TYPED_VARIABLE } ], ")";
+ACTION = "action", IDENTIFIER, "with souls being", "(", [ IDENTIFIER, { ",", IDENTIFIER } ], ")";
 
 DAMAGE_CAUSING_CONDITION = ( NAIL_IDENTIFIER | SPELL_IDENTIFIER ) , "causes" , DMG_TYPE , "being" , DIGIT, "to", 
 ENTITY_TYPE, "&", ENTITY_TYPE, "health", "less than", DIGIT, "results in", ("alive" | "dead");
 
 LIFE_CHECK = "if", IDENTIFIER, "life is", DIGIT, "results in", LIFE_CONDITION;
 
-IDENTIFIER = { LETTER | DIGIT };
+LIFE_CONDITION = ("alive" | "dead");
 
-TYPED_VARIABLE = DATA_TYPE, ":", IDENTIFIER;
+IDENTIFIER = { LETTER | DIGIT };
 
 DATA_TYPE = ( "player" | "enemy" | "boss" | "npc" );
 
@@ -58,14 +58,12 @@ DMG_TYPE = ( "playerdmg" | "upspelldmg" | "downspelldmg" | "horizontalspelldmg" 
 DIGIT = ("0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9");
 
 LETTER = ("a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z");
-
-STRUCTURE = "Hollownest is infected", VARIABLES_DECLARATION, PROGRAM, "You became the void";
 ```
 
 ## Exemplo de uso da linguagem:
 
 ```lua
-HOLLOWNEST IS INFECTED
+Hollownest is infected
 
 souls to be sacrificed
 npc:npc1 lives as Iselda
@@ -86,4 +84,6 @@ sealed vessel
 using soul
 action killenemy with souls being (hollowknight, enemy2)
 end using soul
+
+You became the void
 ```
