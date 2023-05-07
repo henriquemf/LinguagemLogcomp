@@ -1,0 +1,43 @@
+from rply import LexerGenerator
+
+lg = LexerGenerator()
+
+lg.add('LIFE_IS', r'life is less than')
+lg.add('PROGRAM', r'Hollownest is infected')
+lg.add('PROGRAM_END', r'You became the void')
+lg.add('VARIABLES_DECLARATION', r'souls to be sacrificed')
+lg.add('STATEMENT', r'\(.*?\)')
+lg.add('COMMA', r',')
+lg.add('GAME_LOOP', r'using soul')
+lg.add('GAME_LOOP_END', r'end using soul')
+lg.add('CONDITIONAL', r'full soul')
+lg.add('CONDITIONAL_END', r'empty soul')
+lg.add('VARIABLES', r':')
+lg.add('PURE_VESSEL', r'pure vessel')
+lg.add('SEALED_VESSEL', r'sealed vessel')
+lg.add('LIVES_AS', r'lives as')
+lg.add('CAUSES', r'causes')
+lg.add('BEING', r'being')
+lg.add('TO', r'to')
+lg.add('AND', r'&')
+lg.add('IF', r'if')
+lg.add('ACTION', r'action')
+lg.add('WITH', r'with souls being')
+lg.add('RESULTS_IN', r'results in')
+lg.add('VARIABLES_END', r'they became the void')
+lg.add('FUNCTION', r'interaction')
+lg.add('DATA_TYPE', r'(player|enemy|boss|npc)(?![a-zA-Z0-9_])')
+lg.add('ENTITY_TYPE', r'(enemy|boss)(?![a-zA-Z0-9_])')
+lg.add('NAIL_IDENTIFIER', r'(purenail|coilednail|channellednail|sharpnail|oldnail)(?![a-zA-Z0-9_])')
+lg.add('SPELL_IDENTIFIER', r'(desolatedive|howlingwraiths|vengefulspirit)(?![a-zA-Z0-9_])')
+lg.add('DMG_TYPE', r'(playerdmg|upspelldmg|downspelldmg|horizontalspelldmg)(?![a-zA-Z0-9_])')
+lg.add('ENTITIES', r'entities')
+lg.add('LIFE_CONDITION', r'(alive|dead)')
+lg.add('IDENTIFIER', r'[a-zA-Z][a-zA-Z0-9_]*')
+lg.add('DIGIT', r'[0-9]*')
+lg.add('LETTER', r'[a-zA-Z]*')
+
+lg.ignore(r'\s+|\n+|\r+')  # Adicionando os caracteres de espaço em branco, nova linha e retorno de carro
+
+lgfinal = lg.build()
+        

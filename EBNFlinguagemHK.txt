@@ -15,9 +15,9 @@ VARIABLES = DATA_TYPE, ":", IDENTIFIER, "lives as", IDENTIFIER;
 ACTION = "action", IDENTIFIER, "with souls being", "(", [ IDENTIFIER, { ",", IDENTIFIER } ], ")";
 
 DAMAGE_CAUSING_CONDITION = ( NAIL_IDENTIFIER | SPELL_IDENTIFIER ) , "causes" , DMG_TYPE , "being" , DIGIT, "to", 
-ENTITY_TYPE, "&", ENTITY_TYPE, "health", "less than", DIGIT, "results in", ("alive" | "dead");
+ENTITY_TYPE, "&", LIFE_CHECK;
 
-LIFE_CHECK = "if", IDENTIFIER, "life is", DIGIT, "results in", LIFE_CONDITION;
+LIFE_CHECK = "if", IDENTIFIER, "life is less than", DIGIT, "results in", LIFE_CONDITION;
 
 LIFE_CONDITION = ("alive" | "dead");
 
