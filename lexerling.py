@@ -3,7 +3,7 @@ from rply import LexerGenerator
 lg = LexerGenerator()
 
 lg.add('LIFE_IS', r'life is less than')
-lg.add('PROGRAM', r'Hollownest is infected')
+lg.add('START_PROGRAM', r'Hollownest is infected')
 lg.add('PROGRAM_END', r'You became the void')
 lg.add('VARIABLES_DECLARATION', r'souls to be sacrificed')
 lg.add('STATEMENT', r'\(.*?\)')
@@ -35,7 +35,6 @@ lg.add('ENTITIES', r'entities')
 lg.add('LIFE_CONDITION', r'(alive|dead)')
 lg.add('IDENTIFIER', r'[a-zA-Z][a-zA-Z0-9_]*')
 lg.add('DIGIT', r'[0-9]*')
-lg.add('LETTER', r'[a-zA-Z]*')
 
 lg.ignore(r'\s+|\n+|\r+')  # Adicionando os caracteres de espaço em branco, nova linha e retorno de carro
 
