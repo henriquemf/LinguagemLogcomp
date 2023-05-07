@@ -12,17 +12,14 @@ class Parser():
     def parse(self):
         @self.pg.production('program : START_PROGRAM statement_list PROGRAM_END')
         def program(p):
-            print('teste')
             return p[1]
 
         @self.pg.production('statement_list : statement')
         def statement_list_single(p):
-            print('teste1')
             return [p[0]]
 
         @self.pg.production('statement_list : statement statement_list')
         def statement_list_multiple(p):
-            print('teste2')
             return [p[0]] + p[1]
 
         @self.pg.production('statement : conditional')
@@ -31,17 +28,14 @@ class Parser():
         @self.pg.production('statement : game_loop')
         @self.pg.production('statement : action')
         def statement(p):
-            print('teste3')
             return p[0]
 
         @self.pg.production('identifier_list : IDENTIFIER')
         def identifier_list_single(p):
-            print('teste4')
             return [p[0].getstr()]
 
         @self.pg.production('identifier_list : IDENTIFIER COMMA identifier_list')
         def identifier_list_multiple(p):
-            print('teste5')
             return [p[0].getstr()] + p[2]
 
         @self.pg.production('damage_causing_condition : NAIL_IDENTIFIER CAUSES DMG_TYPE BEING DIGIT TO ENTITY_TYPE')
@@ -49,22 +43,18 @@ class Parser():
         @self.pg.production('damage_causing_condition : NAIL_IDENTIFIER CAUSES DMG_TYPE BEING DIGIT TO ENTITY_TYPE AND life_check')
         @self.pg.production('damage_causing_condition : SPELL_IDENTIFIER CAUSES DMG_TYPE BEING DIGIT TO ENTITY_TYPE AND life_check')
         def damage_causing_condition(p):
-            print('teste6')
             return p
 
         @self.pg.production('conditional : CONDITIONAL damage_causing_condition CONDITIONAL_END')
         def conditional(p):
-            print('teste7')
             return p[1]
 
         @self.pg.production('life_check : IF IDENTIFIER LIFE_IS DIGIT RESULTS_IN LIFE_CONDITION')
         def life_check(p):
-            print('teste8')
             return p
         
         @self.pg.production('variables : DATA_TYPE VARIABLES IDENTIFIER LIVES_AS IDENTIFIER')
         def variables(p):
-            print('teste9')
             return p
 
         @self.pg.production('variables_list : variables')
@@ -73,27 +63,22 @@ class Parser():
 
         @self.pg.production('variables_list : variables variables_list')
         def variables_list_multiple(p):
-            print('teste10')
             return [p[0]] + p[1]
 
         @self.pg.production('variables_declaration : VARIABLES_DECLARATION variables_list VARIABLES_END')
         def variables_declaration(p):
-            print('teste10')
             return p
 
         @self.pg.production('function : FUNCTION IDENTIFIER ENTITIES identifier_list PURE_VESSEL statement_list SEALED_VESSEL')
         def function(p):
-            print('teste11')
             return p
 
         @self.pg.production('game_loop : GAME_LOOP statement_list GAME_LOOP_END')
         def game_loop(p):
-            print('teste12')
             return p
 
         @self.pg.production('action : ACTION IDENTIFIER WITH identifier_list')
         def action(p):
-            print('teste13')
             return p
 
         @self.pg.error
