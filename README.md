@@ -6,6 +6,11 @@
 ## Objetivo :crossed_flags::
 O objetivo desse projeto é criar uma linguagem própria, com um uso específico, do 0, crianco todas as condições necessárias para que ela tenha coisas básicas como um LOOP, condicionais, uma declaração e chamada de função.
 
+## Considerações:
+A linguagem criada possui algumas limitações devido ao funcionamento do jogo e da lógica apresentada. No jogo, apenas um único ataque pode ser executado de cada vez, não há como sobrepor ataques em uma única execução de comando. Dessa forma, só é permitido utilizar apenas um único ATAQUE dentro de GameLoop, visto que não é permitido no próprio jogo essa sobreposição. 
+
+Além disso, a função possui o papel de simular um ataque com a permissão de fazer isso N vezes com a utilização do GameLoop ou somente se a vida do inimigo for menor que um certo valor utilizando o CONDITIONAL. Dessa forma, ela sempre irá retornar "ALIVE" ou "DEAD" no print final do terminal. 
+
 ### Lista de tarefas :heavy_check_mark::
 - [x] Pensar no tema
 - [x] Criar structure
@@ -20,34 +25,29 @@ O objetivo desse projeto é criar uma linguagem própria, com um uso específico
 ## EBNF da Linguagem:
 
 ```lua
-PROGRAM = "Hollownest is infected", VARIABLES_DECLARATION,{ STATEMENT }, "You became the void";
+PROGRAM = VARIABLES_DECLARATION,{ STATEMENT };
 
 STATEMENT = ( CONDITIONAL | VARIABLES | FUNCTION );
 
-GAME_LOOP = "using soul", { STATEMENT }, "end using soul";
+GAME_LOOP = "usingsoul", { STATEMENT }, "endusingsoul";
 
-CONDITIONAL = "full soul", DAMAGE_CAUSING_CONDITION, "empty soul";
+CONDITIONAL = "if", IDENTIFIER, "lifeislessthan", DIGIT, ATTACK, "empty";
 
-VARIABLES_DECLARATION = "souls to be sacrificed", { VARIABLES }, "they became the void";
+VARIABLES_DECLARATION = "souls", { VARIABLES }, "eaten";
 
-FUNCTION = "interaction", IDENTIFIER, "entities", [ IDENTIFIER, { ",", IDENTIFIER } ], "pure vessel", { STATEMENT }, "sealed vessel";
+FUNC_TYPE = ( "life_condition" );
 
-VARIABLES = DATA_TYPE, ":", IDENTIFIER, "lives as", IDENTIFIER;
+FUNCTION = "interaction", ":", FUNC_TYPE, IDENTIFIER, "entities", [ IDENTIFIER, { ",", IDENTIFIER } ], "purevessel", { ATTACK },"return", IDENTIFIER, "sealedvessel";
 
-ACTION = "action", IDENTIFIER, "with souls being", "(", [ IDENTIFIER, { ",", IDENTIFIER } ], ")";
+VARIABLES = DATA_TYPE, ":", IDENTIFIER, "lives";
 
-DAMAGE_CAUSING_CONDITION = ( NAIL_IDENTIFIER | SPELL_IDENTIFIER ) , "causes" , DMG_TYPE , "being" , DIGIT, "to", 
-ENTITY_TYPE, "&", ENTITY_TYPE, "health", "less than", DIGIT, "results in", ("alive" | "dead");
+ACTION = "action", IDENTIFIER, "entities", [ IDENTIFIER, { ",", IDENTIFIER } ], "done";
 
-LIFE_CHECK = "if", IDENTIFIER, "life is", DIGIT, "results in", LIFE_CONDITION;
-
-LIFE_CONDITION = ("alive" | "dead");
+ATTACK = "begin", IDENTIFIER, "uses", ( NAIL_IDENTIFIER | SPELL_IDENTIFIER ) , "causes" , DMG_TYPE , "being" , DIGIT, "to", IDENTIFIER;
 
 IDENTIFIER = { LETTER | DIGIT };
 
-DATA_TYPE = ( "player" | "enemy" | "boss" | "npc" );
-
-ENTITY_TYPE = ( "enemy" | "boss" ), IDENTIFIER;
+DATA_TYPE = ( "player" | "enemy" | "boss" );
 
 NAIL_IDENTIFIER = ( "purenail" | "coilednail" | "channellednail"  | "sharpnail" | "oldnail" );
 
@@ -63,27 +63,20 @@ LETTER = ("a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" 
 ## Exemplo de uso da linguagem:
 
 ```lua
-Hollownest is infected
-
-souls to be sacrificed
-npc:npc1 lives as Iselda
-npc:npc2 lives as Cornifer
-player:hollowknight lives as Hollow Knight
-boss:boss1 lives as False Knight
-enemy:enemy1 lives as Aspid
-enemy:enemy2 lives as Boulder
-they became the void
-
-interaction killenemy entities (knight, generalenemy)
-pure vessel
-    full soul
-        purenail causes playerdmg being 21 to enemy1 & enemy1 health less than 21 results in dead
-    empty soul
-sealed vessel
-
-using soul
-action killenemy with souls being (hollowknight, enemy2)
-end using soul
-
-You became the void
+souls
+player:hollowknight lives
+enemy:hopper lives
+eaten
+interaction:life_condition ataque1 entities enemy:enemy1, player:player1 
+purevessel
+    usingsoul 10
+        if enemy1 lifeislessthan 10
+            begin player1 uses purenail causes playerdmg being 1 to enemy1    
+        empty
+        begin player1 uses purenail causes playerdmg being 1 to enemy1
+        5
+    endusingsoul
+    return enemy1
+sealedvessel
+action ataque1 entities hopper, hollowknight done
 ```
