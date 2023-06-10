@@ -3,16 +3,16 @@ player:hollowknight lives
 enemy:aspid lives
 eaten
 if aspid lifeislessthan 21
-    begin hollowknight uses purenail causes playerdmg being 21 to aspid    
+    begin hollowknight uses purenail causes playerdmg being 1 to aspid    
 empty
-interaction teste1 entities enemy:aspid, player:hollowknight 
+interaction:life_condition teste1 entities enemy:enemy1, player:player1 
 purevessel
     usingsoul 20
-        begin hollowknight uses purenail causes playerdmg being 21 to aspid
-        begin hollowknight uses howlingwraiths causes upspelldmg being 15 to aspid
-        begin hollowknight uses desolatedive causes downspelldmg being 15 to aspid
+        begin player1 uses purenail causes playerdmg being 1 to enemy1
+        begin player1 uses howlingwraiths causes upspelldmg being 1 to enemy1
+        begin player1 uses desolatedive causes downspelldmg being 1 to enemy1
         5
     endusingsoul
-    return aspid
+    return enemy1
 sealedvessel
 action teste1 entities aspid, hollowknight done

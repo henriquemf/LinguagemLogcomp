@@ -6,7 +6,7 @@ class Parser():
                       'DMG_TYPE', 'BEING', 'DIGIT', 'TO', 'SPELL_IDENTIFIER', 
                       'CONDITIONAL_END', 'IF', 'LIFE_IS', 'DATA_TYPE', 'VARIABLES', 'LIVES',
                       'VARIABLES_DECLARATION', 'VARIABLES_END', 'FUNCTION', 'ENTITIES', 'PURE_VESSEL', 'SEALED_VESSEL',
-                      'GAME_LOOP', 'GAME_LOOP_END','ACTION', 'DONE', 'USES', 'RETURN', 'BEGIN',
+                      'GAME_LOOP', 'GAME_LOOP_END','ACTION', 'DONE', 'USES', 'RETURN', 'BEGIN', 'FUNC_TYPE'
                       ])
 
     def parse(self):
@@ -85,7 +85,7 @@ class Parser():
         def variables_declaration(p):
             return p
 
-        @self.pg.production('function : FUNCTION IDENTIFIER ENTITIES identifier_typed_list PURE_VESSEL inside_function_list RETURN IDENTIFIER SEALED_VESSEL')
+        @self.pg.production('function : FUNCTION VARIABLES FUNC_TYPE IDENTIFIER ENTITIES identifier_typed_list PURE_VESSEL inside_function_list RETURN IDENTIFIER SEALED_VESSEL')
         def function(p):
             return p
 

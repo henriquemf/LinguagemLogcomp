@@ -2,7 +2,7 @@ import sys
 import re
 
 reserved_words = ['souls', 'eaten', 'empty', 'purevessel', 'sealedvessel', 'lifeislessthan', 'usingsoul', 'endusingsoul', 
-                  'lives', 'causes', 'being', 'to', 'if', 'action', 'interaction', 'entities', 'player', 
+                  'lives', 'causes', 'being', 'to', 'if', 'action', 'interaction', 'entities', 'player', 'life_condition',
                   'enemy', 'done', 'return', 'uses', 'purenail', 'coilednail', 'desolatedive', 'howlingwraiths', 'playerdmg', 'upspelldmg', 
                   'downspelldmg', 'begin']
 
@@ -21,6 +21,10 @@ class Node():
 class IntVal(Node):
     def Evaluate(self, symbolTable):
         return ("",int(self.value))
+    
+class StringVal(Node):
+    def Evaluate(self, symbolTable):
+        return ("", self.value)
 
 class NoOp(Node):
     def evaluate(self, symbolTable):
@@ -79,26 +83,27 @@ class Conditional(Node):
         identifier = self.children[0].Evaluate(symbolTable)
         value = self.children[1].Evaluate(symbolTable)
 
-        if identifier < value:
+        if identifier[1] < value[1]:
             self.children[2].Evaluate(symbolTable)
 
 class GameLoop(Node):
     def Evaluate(self, symbolTable):
-        initial_value = self.children[0].Evaluate(symbolTable)[0]  # Valor inicial
-        decrement_value = self.children[1].Evaluate(symbolTable)[0]  # Valor a ser decrementado
+        initial_value = self.children[0].Evaluate(symbolTable)[1]  # Valor inicial
+        decrement_value = self.children[1].Evaluate(symbolTable)[1]  # Valor a ser decrementado
 
         while initial_value > 0:
             self.children[2].Evaluate(symbolTable)  # Executa o bloco de instruções
             initial_value -= decrement_value
 
 class VarDecl(Node):
-    def Evaluate(self, symbolTable):
-            if self.value == "enemy":
-                symbolTable.declare(self.children[0].value, ("enemy", self.children[1].Evaluate(symbolTable)[1]))
-            elif self.value == "player":
-                symbolTable.declare(self.children[0].value, ("player", self.children[1].Evaluate(symbolTable)[1]))
-            else:
-                raise Exception("Erro: Tipo inválido")
+    def Evaluate(self, symbolTable):    
+        if self.value == "enemy":
+            symbolTable.declare(self.children[0].value, ("enemy", self.children[1].Evaluate(symbolTable)[1]))
+        elif self.value == "player":
+            symbolTable.declare(self.children[0].value, ("player", self.children[1].Evaluate(symbolTable)[1]))
+        else:
+            print(self.value)
+            raise Exception("Erro: Tipo inválido")
     
 class FuncDec(Node):
     def Evaluate(self, funcTable):
@@ -119,9 +124,6 @@ class FuncCall(Node):
             symbolTableFunc.setter(varDecl.children[0].value, funcChildren.Evaluate(funcTable))
 
         (type, value) = block.Evaluate(symbolTableFunc)
-
-        if type != identifier.Evaluate(funcTable)[0]:
-            raise Exception("Erro: Tipo de retorno inválido")
         
         return (type, value)
     
@@ -134,8 +136,19 @@ class Attack(Node):
         value = self.children[0].Evaluate(symbolTable)
         identifier_enemy = self.children[1].Evaluate(symbolTable)
 
-        identifier_enemy[1] -= value[1]
-        symbolTable.setter(self.children[1].value, identifier_enemy)
+        final_value = (identifier_enemy[0], identifier_enemy[1] - value[1])
+        if final_value[1] < 0:
+            final_value = (identifier_enemy[0], 0)
+
+        symbolTable.setter(self.children[1].value, final_value)
+
+        if final_value[1] == 0:
+            print("DEAD")
+            return ("", "DEAD")
+        else:
+            vida = symbolTable.getter(self.children[1].value)
+            print("ALIVE" + " COM VIDA:", vida[1])
+            return ("", "ALIVE")
     
 # --------------------------------------------------------------------------------------
 #                                     CLASSES GERAIS
@@ -185,7 +198,6 @@ class Tokenizer:
                         palavra += self.source[self.position]
                         self.position += 1
                     else:
-                        print(palavra)
                         if palavra in reserved_words:
                             if palavra == 'souls':
                                 self.next = Token('VARIABLES_DECLARATION', palavra)
@@ -273,6 +285,9 @@ class Tokenizer:
                                 return
                             elif palavra == 'begin':
                                 self.next = Token('BEGIN', palavra)
+                                return
+                            elif palavra == 'life_condition':
+                                self.next = Token('FUNC_TYPE', palavra)
                                 return
                             else: 
                                 raise Exception('Unexpected character')
@@ -365,19 +380,22 @@ class Parser:
             tokenizer.selectNext()
             if tokenizer.next.type != 'IDEN':
                 raise Exception('Expected IDEN')
-            identifier = tokenizer.next.value
+            identifier = Identifier(tokenizer.next.value, [])
             tokenizer.selectNext()
             if tokenizer.next.type != 'LIVES':
                 raise Exception('Expected LIVES')
             if data_type == 'player':
-                node_declaration = VarDecl(data_type, [identifier, 5])
+                life = IntVal(5, [])
+                node_declaration = VarDecl(data_type, [identifier, life])
             elif data_type == 'enemy':
-                if identifier == 'aspid':
-                    node_declaration = VarDecl(data_type, [identifier, 15])
-                elif identifier == 'hopper':
-                    node_declaration = VarDecl(data_type, [identifier, 40])
+                if identifier.value == 'aspid':
+                    life = IntVal(15, [])
+                    node_declaration = VarDecl(data_type, [identifier, life])
+                elif identifier.value == 'hopper':
+                    life = IntVal(40, [])
+                    node_declaration = VarDecl(data_type, [identifier, life])
                 else:
-                    raise Exception('Expected ASPID or HOPPER')
+                    raise Exception('Expected aspid or hopper')
             else:
                 raise Exception('Expected PLAYER or ENEMY')
             tokenizer.selectNext()
@@ -407,69 +425,80 @@ class Parser:
             
         elif tokenizer.next.type == 'FUNCTION_DECLARATION':
             tokenizer.selectNext()
-            if tokenizer.next.type == 'IDEN':
-                nodeIdenFunc = Identifier(tokenizer.next.value, None)
+            if tokenizer.next.type == 'DC':
                 tokenizer.selectNext()
-                if tokenizer.next.type == 'ENTITIES':
+                if tokenizer.next.type == 'FUNC_TYPE':
+                    funcType = tokenizer.next.value
                     tokenizer.selectNext()
-                    if tokenizer.next.type == 'PLAYER' or tokenizer.next.type == 'ENEMY':
-                        nodeType = tokenizer.next.value
+                    if tokenizer.next.type == 'IDEN':
+                        nodeIdenFunc = Identifier(tokenizer.next.value, None)
                         tokenizer.selectNext()
-                        if tokenizer.next.type == 'DC':
+                        if tokenizer.next.type == 'ENTITIES':
                             tokenizer.selectNext()
-                            if tokenizer.next.type == 'IDEN':
-                                nodeIdenVar = Identifier(tokenizer.next.value, None)
-                                nodeVarDecl = VarDecl(nodeType, [nodeIdenVar])
-                                varDeclList = [nodeVarDecl]
+                            if tokenizer.next.type == 'PLAYER' or tokenizer.next.type == 'ENEMY':
+                                nodeType = tokenizer.next.value
                                 tokenizer.selectNext()
-                                while tokenizer.next.type == 'COMMA':
+                                if tokenizer.next.type == 'DC':
                                     tokenizer.selectNext()
-                                    if tokenizer.next.type == 'PLAYER' or tokenizer.next.type == 'ENEMY':
-                                        nodeType = tokenizer.next.value
+                                    if tokenizer.next.type == 'IDEN':
+                                        life = IntVal(100, [])
+                                        nodeIdenVar = Identifier(tokenizer.next.value, None)
+                                        nodeVarDecl = VarDecl(nodeType, [nodeIdenVar, life])
+                                        varDeclList = [nodeVarDecl]
                                         tokenizer.selectNext()
-                                        if tokenizer.next.type == 'DC':
+                                        while tokenizer.next.type == 'COMMA':
                                             tokenizer.selectNext()
-                                            if tokenizer.next.type == 'IDEN':
-                                                nodeIdenVar = Identifier(tokenizer.next.value, None)
-                                                nodeVarDecl = VarDecl(nodeType, [nodeIdenVar])
-                                                varDeclList.append(nodeVarDecl)
+                                            if tokenizer.next.type == 'PLAYER' or tokenizer.next.type == 'ENEMY':
+                                                nodeType = tokenizer.next.value
                                                 tokenizer.selectNext()
+                                                if tokenizer.next.type == 'DC':
+                                                    tokenizer.selectNext()
+                                                    if tokenizer.next.type == 'IDEN':
+                                                        life = IntVal(100, [])
+                                                        nodeIdenVar = Identifier(tokenizer.next.value, None)
+                                                        nodeVarDecl = VarDecl(nodeType, [nodeIdenVar, life])
+                                                        varDeclList.append(nodeVarDecl)
+                                                        tokenizer.selectNext()
+                                                    else:
+                                                        raise Exception('Expected IDEN')
+                                                else:
+                                                    raise Exception('Expected ":"')
                                             else:
-                                                raise Exception('Expected IDEN')
-                                        else:
-                                            raise Exception('Expected ":"')
-                                    else:
-                                        raise Exception('Expected PLAYER or ENEMY')
-                                if tokenizer.next.type == 'NEWLINE':
-                                    tokenizer.selectNext()
-                                    if tokenizer.next.type == 'FUNCTION_START':
-                                        node_block = Block(None, [])
-                                        tokenizer.selectNext()
-                                        while tokenizer.next.type != 'FUNCTION_END':
-                                            node_block.children.append(Parser.parseStatement(tokenizer))
+                                                raise Exception('Expected PLAYER or ENEMY')
+                                        if tokenizer.next.type == 'NEWLINE':
                                             tokenizer.selectNext()
-                                        if tokenizer.next.type == 'FUNCTION_END':
-                                            tokenizer.selectNext()
-                                            if tokenizer.next.type == 'NEWLINE':
-                                                return FuncDec(None, [nodeIdenFunc, varDeclList, node_block])
+                                            if tokenizer.next.type == 'FUNCTION_START':
+                                                node_block = Block(None, [])
+                                                tokenizer.selectNext()
+                                                while tokenizer.next.type != 'FUNCTION_END':
+                                                    node_block.children.append(Parser.parseStatement(tokenizer))
+                                                    tokenizer.selectNext()
+                                                if tokenizer.next.type == 'FUNCTION_END':
+                                                    tokenizer.selectNext()
+                                                    if tokenizer.next.type == 'NEWLINE':
+                                                        return FuncDec(funcType, [nodeIdenFunc, varDeclList, node_block])
+                                                    else:
+                                                        raise Exception('Expected NEWLINE')
+                                                else:
+                                                    raise Exception('Expected FUNCTION_END')
                                             else:
-                                                raise Exception('Expected NEWLINE')
+                                                raise Exception('Expected FUNCTION_START')
                                         else:
-                                            raise Exception('Expected FUNCTION_END')
+                                            raise Exception('Expected NEWLINE')
                                     else:
-                                        raise Exception('Expected FUNCTION_START')
+                                        raise Exception('Expected IDEN')
                                 else:
-                                    raise Exception('Expected NEWLINE')
+                                    raise Exception('Expected ":"')
                             else:
-                                raise Exception('Expected IDEN')
+                                raise Exception('Expected PLAYER or ENEMY')
                         else:
-                            raise Exception('Expected ":"')
+                            raise Exception('Expected ENTITIES')
                     else:
-                        raise Exception('Expected PLAYER or ENEMY')
+                        raise Exception('Expected IDEN')
                 else:
-                    raise Exception('Expected ENTITIES')
+                    raise Exception('Expected FUNC_TYPE')
             else:
-                raise Exception('Expected IDEN')
+                raise Exception('Expected ":"') 
 
         # -------------------------------------------------------------------------------------------------------------
         #                                              GAMELOOP PART
@@ -537,19 +566,16 @@ class Parser:
             tokenizer.selectNext()
             if tokenizer.next.type == 'IDEN':
                 node = Identifier(tokenizer.next.value, [])
-                tokenizer.selectNext()
-                if tokenizer.next.type == 'ENTITIES':
+                if tokenizer.watchNext().type == 'ENTITIES':
                     tokenizer.selectNext()
                     nodeFunc = FuncCall(node.value, [])
-                    tokenizer.selectNext()
-                    if tokenizer.next.type != 'DONE':
-                        tokenizer.selectNext()
+                    if tokenizer.watchNext().type != 'DONE':
                         while tokenizer.next.type != 'DONE':
+                            tokenizer.selectNext()
                             nodeIden = Identifier(tokenizer.next.value, None)
                             nodeFunc.children.append(nodeIden)
                             tokenizer.selectNext()
                             if tokenizer.next.type != 'COMMA' and tokenizer.next.type != 'DONE':
-                                print(tokenizer.next.type)
                                 raise Exception('Expected COMMA')
                         return nodeFunc
                     else:

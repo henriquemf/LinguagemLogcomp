@@ -3,26 +3,24 @@ from parserling import Parser
 from rply.errors import ParsingError
 
 text = """
-souls to be sacrificed
+souls
 player:hollowknight lives
-boss:boss1 lives
-enemy:enemy1 lives
-enemy:enemy2 lives
-they became the void
-if enemy1 life is less than 21
-    begin hollowknight uses purenail causes playerdmg being 21 to enemy1    
-empty soul
-interaction teste1 entities enemy:enemy1, player:hollowknight 
-pure vessel
-    using soul 20
-        begin hollowknight uses purenail causes playerdmg being 21 to enemy1
-        begin hollowknight uses howlingwraiths causes upspelldmg being 15 to enemy1
-        begin hollowknight uses desolatedive causes downspelldmg being 15 to enemy1
+enemy:aspid lives
+eaten
+if aspid lifeislessthan 21
+    begin hollowknight uses purenail causes playerdmg being 21 to aspid    
+empty
+interaction:life_condition teste1 entities enemy:aspid, player:hollowknight 
+purevessel
+    usingsoul 20
+        begin hollowknight uses purenail causes playerdmg being 21 to aspid
+        begin hollowknight uses howlingwraiths causes upspelldmg being 15 to aspid
+        begin hollowknight uses desolatedive causes downspelldmg being 15 to aspid
         5
-    end using soul
-    return enemy1
-sealed vessel
-action teste1 entities enemy1, hollowknight done
+    endusingsoul
+    return live_condition
+sealedvessel
+action teste1 entities aspid, hollowknight done
 """
 
 

@@ -2,13 +2,15 @@ PROGRAM = VARIABLES_DECLARATION,{ STATEMENT };
 
 STATEMENT = ( CONDITIONAL | VARIABLES | FUNCTION );
 
-GAME_LOOP = "using soul", { STATEMENT }, "end using soul";
+GAME_LOOP = "usingsoul", { STATEMENT }, "endusingsoul";
 
-CONDITIONAL = "if", IDENTIFIER, "life is less than", DIGIT, ATTACK, "empty soul";
+CONDITIONAL = "if", IDENTIFIER, "lifeislessthan", DIGIT, ATTACK, "empty";
 
-VARIABLES_DECLARATION = "souls to be sacrificed", { VARIABLES }, "they became the void";
+VARIABLES_DECLARATION = "souls", { VARIABLES }, "eaten";
 
-FUNCTION = "interaction", IDENTIFIER, "entities", [ IDENTIFIER, { ",", IDENTIFIER } ], "pure vessel", { ATTACK },"return", IDENTIFIER, "sealed vessel";
+FUNC_TYPE = ( "life_condition" );
+
+FUNCTION = "interaction", ":", FUNC_TYPE, IDENTIFIER, "entities", [ IDENTIFIER, { ",", IDENTIFIER } ], "purevessel", { ATTACK },"return", IDENTIFIER, "sealedvessel";
 
 VARIABLES = DATA_TYPE, ":", IDENTIFIER, "lives";
 
