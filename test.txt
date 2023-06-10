@@ -9,8 +9,6 @@ interaction:life_condition teste1 entities enemy:enemy1, player:player1
 purevessel
     usingsoul 20
         begin player1 uses purenail causes playerdmg being 1 to enemy1
-        begin player1 uses howlingwraiths causes upspelldmg being 1 to enemy1
-        begin player1 uses desolatedive causes downspelldmg being 1 to enemy1
         5
     endusingsoul
     return enemy1

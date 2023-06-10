@@ -32,23 +32,21 @@ DIGIT = ("0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9");
 
 LETTER = ("a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z");
 
-souls to be sacrificed
+souls
 player:hollowknight lives
-boss:boss1 lives
-enemy:enemy1 lives
-enemy:enemy2 lives
-they became the void
-if enemy1 life is less than 21
-    begin hollowknight uses purenail causes playerdmg being 21 to enemy1    
-empty soul
-interaction teste1 entities enemy:enemy1, player:hollowknight 
-pure vessel
-    using soul 20
-        begin hollowknight uses purenail causes playerdmg being 21 to enemy1
-        begin hollowknight uses howlingwraiths causes upspelldmg being 15 to enemy1
-        begin hollowknight uses desolatedive causes downspelldmg being 15 to enemy1
+enemy:aspid lives
+eaten
+if aspid lifeislessthan 21
+    begin hollowknight uses purenail causes playerdmg being 1 to aspid    
+empty
+interaction:life_condition teste1 entities enemy:enemy1, player:player1 
+purevessel
+    usingsoul 20
+        begin player1 uses purenail causes playerdmg being 1 to enemy1
+        begin player1 uses howlingwraiths causes upspelldmg being 1 to enemy1
+        begin player1 uses desolatedive causes downspelldmg being 1 to enemy1
         5
-    end using soul
+    endusingsoul
     return enemy1
-sealed vessel
-action teste1 entities enemy1, hollowknight done
+sealedvessel
+action teste1 entities aspid, hollowknight done
