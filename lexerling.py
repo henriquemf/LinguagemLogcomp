@@ -21,7 +21,6 @@ class Lexer():
         self.lg.add('TO', r'to')
         self.lg.add('IF', r'if')
         self.lg.add('ACTION', r'action')
-        self.lg.add('WITH', r'with souls being')
         self.lg.add('VARIABLES_END', r'they became the void')
         self.lg.add('FUNCTION', r'interaction')
         self.lg.add('ENTITIES', r'entities')

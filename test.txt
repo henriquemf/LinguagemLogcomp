@@ -1,0 +1,18 @@
+souls
+player:hollowknight lives
+enemy:aspid lives
+eaten
+if aspid lifeislessthan 21
+    begin hollowknight uses purenail causes playerdmg being 21 to aspid    
+empty
+interaction teste1 entities enemy:aspid, player:hollowknight 
+purevessel
+    usingsoul 20
+        begin hollowknight uses purenail causes playerdmg being 21 to aspid
+        begin hollowknight uses howlingwraiths causes upspelldmg being 15 to aspid
+        begin hollowknight uses desolatedive causes downspelldmg being 15 to aspid
+        5
+    endusingsoul
+    return aspid
+sealedvessel
+action teste1 entities aspid, hollowknight done

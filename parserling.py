@@ -6,7 +6,7 @@ class Parser():
                       'DMG_TYPE', 'BEING', 'DIGIT', 'TO', 'SPELL_IDENTIFIER', 
                       'CONDITIONAL_END', 'IF', 'LIFE_IS', 'DATA_TYPE', 'VARIABLES', 'LIVES',
                       'VARIABLES_DECLARATION', 'VARIABLES_END', 'FUNCTION', 'ENTITIES', 'PURE_VESSEL', 'SEALED_VESSEL',
-                      'GAME_LOOP', 'GAME_LOOP_END','ACTION', 'WITH', 'DONE', 'USES', 'RETURN', 'BEGIN',
+                      'GAME_LOOP', 'GAME_LOOP_END','ACTION', 'DONE', 'USES', 'RETURN', 'BEGIN',
                       ])
 
     def parse(self):

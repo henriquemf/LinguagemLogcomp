@@ -30,24 +30,23 @@ DIGIT = ("0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9");
 
 LETTER = ("a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z");
 
-Hollownest is infected
-
 souls to be sacrificed
-player:hollowknight lives as Hollow Knight
-boss:boss1 lives as False Knight
-enemy:enemy1 lives as Aspid
-enemy:enemy2 lives as Boulder
+player:hollowknight lives
+boss:boss1 lives
+enemy:enemy1 lives
+enemy:enemy2 lives
 they became the void
-
-interaction killenemy entities (knight, generalenemy)
+if enemy1 life is less than 21
+    begin hollowknight uses purenail causes playerdmg being 21 to enemy1    
+empty soul
+interaction teste1 entities enemy:enemy1, player:hollowknight 
 pure vessel
-    full soul
-        purenail causes playerdmg being 21 to enemy1 & enemy1 health less than 21 results in dead
-    empty soul
+    using soul 20
+        begin hollowknight uses purenail causes playerdmg being 21 to enemy1
+        begin hollowknight uses howlingwraiths causes upspelldmg being 15 to enemy1
+        begin hollowknight uses desolatedive causes downspelldmg being 15 to enemy1
+        5
+    end using soul
+    return enemy1
 sealed vessel
-
-using soul
-action killenemy with souls being (hollowknight, enemy2)
-end using soul
-
-You became the void
+action teste1 entities enemy1, hollowknight done

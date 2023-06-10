@@ -1,10 +1,10 @@
 import sys
 import re
 
-reserved_words = ['souls to be sacrificed', 'they became the void', 'empty soul', 
-                  'pure vessel', 'sealed vessel', 'life is less than', 'using soul', 'end using soul', 'lives', 'causes', 'being', 'to', '&',
-                  'if', 'with souls being', 'action', 'interaction', 'entities', 'player', 'enemy', 'done', 'return', 'uses',
-                  'purenail', 'coilednail', 'desolatedive', 'howlingwraiths', 'playerdmg', 'upspelldmg', 'downspelldmg', 'begin']
+reserved_words = ['souls', 'eaten', 'empty', 'purevessel', 'sealedvessel', 'lifeislessthan', 'usingsoul', 'endusingsoul', 
+                  'lives', 'causes', 'being', 'to', 'if', 'action', 'interaction', 'entities', 'player', 
+                  'enemy', 'done', 'return', 'uses', 'purenail', 'coilednail', 'desolatedive', 'howlingwraiths', 'playerdmg', 'upspelldmg', 
+                  'downspelldmg', 'begin']
 
 # --------------------------------------------------------------------------------------
 #                                     CLASSES NODES
@@ -18,27 +18,9 @@ class Node():
     def Evaluate(self, symbolTable):
         pass
 
-class BinOp(Node):
-    def Evaluate(self, symbolTable):
-        left_value = self.children[0].Evaluate(symbolTable)
-        right_value = self.children[1].Evaluate(symbolTable)
-
-        left_value_type = left_value[0]
-        right_value_type = right_value[0]
-
-        left_value = left_value[1]
-
-        if self.value == 'LESS_THAN':
-            if left_value < right_value:
-                return ("", 1)
-            else:
-                return ("", 0)
-        else:
-            raise Exception("Erro: Operador inválido")
-
 class IntVal(Node):
     def Evaluate(self, symbolTable):
-        return ("Int",int(self.value))
+        return ("",int(self.value))
 
 class NoOp(Node):
     def evaluate(self, symbolTable):
@@ -47,10 +29,6 @@ class NoOp(Node):
 class Identifier(Node):
     def Evaluate(self, symbolTable):
         return symbolTable.getter(self.value)
-    
-class Assignment(Node):
-    def Evaluate(self, symbolTable):
-        symbolTable.setter(self.children[0].value, self.children[1].Evaluate(symbolTable))
     
 class Block(Node):  
     def Evaluate(self, symbolTable):
@@ -96,22 +74,22 @@ class FuncTable():
         else:
             raise Exception("Erro: Variável já declarada")
 
-class Println(Node):
+class Conditional(Node):
     def Evaluate(self, symbolTable):
-        print(self.children[0].Evaluate(symbolTable)[1])
+        identifier = self.children[0].Evaluate(symbolTable)
+        value = self.children[1].Evaluate(symbolTable)
 
-class IfElse(Node):
-    def Evaluate(self, symbolTable):
-        if self.children[0].Evaluate(symbolTable)[1]:
-            self.children[1].Evaluate(symbolTable)
-        else:
-            if len(self.children) == 3:
-                self.children[2].Evaluate(symbolTable)
+        if identifier < value:
+            self.children[2].Evaluate(symbolTable)
 
 class GameLoop(Node):
     def Evaluate(self, symbolTable):
-        while self.children[0].Evaluate(symbolTable)[1]:
-            self.children[1].Evaluate(symbolTable)
+        initial_value = self.children[0].Evaluate(symbolTable)[0]  # Valor inicial
+        decrement_value = self.children[1].Evaluate(symbolTable)[0]  # Valor a ser decrementado
+
+        while initial_value > 0:
+            self.children[2].Evaluate(symbolTable)  # Executa o bloco de instruções
+            initial_value -= decrement_value
 
 class VarDecl(Node):
     def Evaluate(self, symbolTable):
@@ -150,6 +128,14 @@ class FuncCall(Node):
 class Return(Node):
     def Evaluate(self, symbolTable):
         return self.children[0].Evaluate(symbolTable)
+
+class Attack(Node):
+    def Evaluate(self, symbolTable):
+        value = self.children[0].Evaluate(symbolTable)
+        identifier_enemy = self.children[1].Evaluate(symbolTable)
+
+        identifier_enemy[1] -= value[1]
+        symbolTable.setter(self.children[1].value, identifier_enemy)
     
 # --------------------------------------------------------------------------------------
 #                                     CLASSES GERAIS
@@ -199,29 +185,30 @@ class Tokenizer:
                         palavra += self.source[self.position]
                         self.position += 1
                     else:
+                        print(palavra)
                         if palavra in reserved_words:
-                            if palavra == 'souls to be sacrificed':
+                            if palavra == 'souls':
                                 self.next = Token('VARIABLES_DECLARATION', palavra)
                                 return
-                            elif palavra == 'they became the void':
+                            elif palavra == 'eaten':
                                 self.next = Token('VARIABLES_END', palavra)
                                 return
-                            elif palavra == 'empty soul':
+                            elif palavra == 'empty':
                                 self.next = Token('CONDITIONAL_END', palavra)
                                 return
-                            elif palavra == 'pure vessel':
+                            elif palavra == 'purevessel':
                                 self.next = Token('FUNCTION_START', palavra)
                                 return
-                            elif palavra == 'sealed vessel':
+                            elif palavra == 'sealedvessel':
                                 self.next = Token('FUNCTION_END', palavra)
                                 return
-                            elif palavra == 'life is less than':
+                            elif palavra == 'lifeislessthan':
                                 self.next = Token('LESS_THAN', palavra)
                                 return
-                            elif palavra == 'using soul':
-                                self.next = Token('GAME_LOOP', palavra)
+                            elif palavra == 'usingsoul':
+                                self.next = Token('GAME_LOOP_START', palavra)
                                 return
-                            elif palavra == 'end using soul':
+                            elif palavra == 'endusingsoul':
                                 self.next = Token('GAME_LOOP_END', palavra)
                                 return
                             elif palavra == 'lives':
@@ -238,9 +225,6 @@ class Tokenizer:
                                 return
                             elif palavra == 'if':
                                 self.next = Token('IF', palavra)
-                                return
-                            elif palavra == 'with souls being':
-                                self.next = Token('WITH', palavra)
                                 return
                             elif palavra == 'action':
                                 self.next = Token('FUNCTION_CALL', palavra)
@@ -277,12 +261,6 @@ class Tokenizer:
                                 return
                             elif palavra == 'downspelldmg':
                                 self.next = Token('DOWNSPELLDMG', palavra)
-                                return
-                            elif palavra == 'alive':
-                                self.next = Token('ALIVE', palavra)
-                                return
-                            elif palavra == 'dead':
-                                self.next = Token('DEAD', palavra)
                                 return
                             elif palavra == 'done':
                                 self.next = Token('DONE', palavra)
@@ -374,10 +352,10 @@ class Parser:
     def parseBlockVariable(tokenizer):
         node_block = Block(None, [])
         tokenizer.selectNext()
+        if tokenizer.next.type != 'NEWLINE':
+            raise Exception('Expected NEWLINE')
+        tokenizer.selectNext()
         while tokenizer.next.type != 'VARIABLES_END':
-            if tokenizer.next.type != 'NEWLINE':
-                raise Exception('Expected NEWLINE')
-            tokenizer.selectNext()
             if tokenizer.next.type != 'PLAYER' and tokenizer.next.type != 'ENEMY':
                 raise Exception('Expected DATA_TYPE')
             data_type = tokenizer.next.value
@@ -391,7 +369,6 @@ class Parser:
             tokenizer.selectNext()
             if tokenizer.next.type != 'LIVES':
                 raise Exception('Expected LIVES')
-            tokenizer.selectNext()
             if data_type == 'player':
                 node_declaration = VarDecl(data_type, [identifier, 5])
             elif data_type == 'enemy':
@@ -401,6 +378,11 @@ class Parser:
                     node_declaration = VarDecl(data_type, [identifier, 40])
                 else:
                     raise Exception('Expected ASPID or HOPPER')
+            else:
+                raise Exception('Expected PLAYER or ENEMY')
+            tokenizer.selectNext()
+            if tokenizer.next.type != 'NEWLINE':
+                raise Exception('Expected NEWLINE')
             node_block.children.append(node_declaration)
             tokenizer.selectNext()
         return node_block
@@ -415,7 +397,7 @@ class Parser:
         if tokenizer.next.type == 'VARIABLES_DECLARATION':
             node_variables = Parser.parseBlockVariable(tokenizer)
             if tokenizer.next.type == 'VARIABLES_END':
-                return Variables(None, [node_variables])
+                return Return(None, [node_variables])
             else:
                 raise Exception('Expected VARIABLES_END')
     
@@ -459,6 +441,7 @@ class Parser:
                                     else:
                                         raise Exception('Expected PLAYER or ENEMY')
                                 if tokenizer.next.type == 'NEWLINE':
+                                    tokenizer.selectNext()
                                     if tokenizer.next.type == 'FUNCTION_START':
                                         node_block = Block(None, [])
                                         tokenizer.selectNext()
@@ -498,15 +481,23 @@ class Parser:
                 node_int = IntVal(tokenizer.next.value, None)
                 tokenizer.selectNext()
                 if tokenizer.next.type == 'NEWLINE':
-                    node_gameloop = Parser.parseBlockGameLoop(tokenizer)
+                    node_block = Block(None, [])
+                    tokenizer.selectNext()
+                    while tokenizer.next.type != 'GAME_LOOP_END':
+                        if tokenizer.next.type == 'INT':
+                            node_int_minus = IntVal(tokenizer.next.value, None)
+                            tokenizer.selectNext()
+                        node_block.children.append(Parser.parseStatement(tokenizer))
+                        tokenizer.selectNext()
                     if tokenizer.next.type == 'GAME_LOOP_END':
-                        return GameLoop(None, [node_int, node_gameloop])
+                        return GameLoop(None, [node_int, node_int_minus, node_block])
                     else:
                         raise Exception('Expected GAME_LOOP_END')
                 else:
                     raise Exception('Expected NEWLINE')
             else:
                 raise Exception('Expected INT')
+
             
         # -------------------------------------------------------------------------------------------------------------
         #                                               CONDITIONAL PART
@@ -515,19 +506,17 @@ class Parser:
         elif tokenizer.next.type == 'IF':
             tokenizer.selectNext()
             if tokenizer.next.type == 'IDEN':
-                nodeIden = Identifier(tokenizer.next.value, None)
+                identifier = Identifier(tokenizer.next.value, None)
                 tokenizer.selectNext()
                 if tokenizer.next.type == 'LESS_THAN':
-                    operation = tokenizer.next.type
                     tokenizer.selectNext()
                     if tokenizer.next.type == 'INT':
-                        node_int = IntVal(tokenizer.next.value, None)
-                        node_less = BinOp(operation, [nodeIden, tokenizer.next.value])
+                        value = IntVal(tokenizer.next.value, None)
                         tokenizer.selectNext()
                         if tokenizer.next.type == 'NEWLINE':
                             node_block = Parser.parseBlockConditional(tokenizer)
                             if tokenizer.next.type == 'CONDITIONAL_END':
-                                return Conditional(None, [nodeIden, node_int, node_less, node_block])
+                                return Conditional(None, [identifier, value, node_block])
                             else:
                                 raise Exception('Expected CONDITIONAL_END')
                         else:
@@ -538,24 +527,30 @@ class Parser:
                     raise Exception('Expected LESS_THAN')
             else:
                 raise Exception('Expected IDEN')
+
             
         # -------------------------------------------------------------------------------------------------------------
         #                                               FUNCCALL PART
         # -------------------------------------------------------------------------------------------------------------
         
-        elif tokenizer.next.type == 'ACTION':
+        elif tokenizer.next.type == 'FUNCTION_CALL':
             tokenizer.selectNext()
             if tokenizer.next.type == 'IDEN':
                 node = Identifier(tokenizer.next.value, [])
-                if tokenizer.watchNext().type == 'ENTITIES':
+                tokenizer.selectNext()
+                if tokenizer.next.type == 'ENTITIES':
                     tokenizer.selectNext()
                     nodeFunc = FuncCall(node.value, [])
-                    if tokenizer.watchNext().type != 'DONE':
+                    tokenizer.selectNext()
+                    if tokenizer.next.type != 'DONE':
+                        tokenizer.selectNext()
                         while tokenizer.next.type != 'DONE':
                             nodeIden = Identifier(tokenizer.next.value, None)
                             nodeFunc.children.append(nodeIden)
-                            if tokenizer.next.type != 'COMMA' and tokenizer.next.type != 'RPAREN':
-                                raise Exception('Expected COMMA or RPAREN')
+                            tokenizer.selectNext()
+                            if tokenizer.next.type != 'COMMA' and tokenizer.next.type != 'DONE':
+                                print(tokenizer.next.type)
+                                raise Exception('Expected COMMA')
                         return nodeFunc
                     else:
                         tokenizer.selectNext()
@@ -588,12 +583,10 @@ class Parser:
         elif tokenizer.next.type == 'BEGIN':
             tokenizer.selectNext()
             if tokenizer.next.type == 'IDEN':
-                nodeIden = Identifier(tokenizer.next.value, None)
                 tokenizer.selectNext()
                 if tokenizer.next.type == 'USES':
                     tokenizer.selectNext()
                     if tokenizer.next.type == 'PURENAIL' or tokenizer.next.type == 'COILEDNAIL' or tokenizer.next.type == 'DESOLATEDIVE' or tokenizer.next.type == 'HOWLINGWRAITHS':
-                        dmgType = tokenizer.next.type
                         tokenizer.selectNext()
                         if tokenizer.next.type == 'CAUSES':
                             tokenizer.selectNext()
@@ -608,7 +601,7 @@ class Parser:
                                             tokenizer.selectNext()
                                             if tokenizer.next.type == 'IDEN':
                                                 nodeIden2 = Identifier(tokenizer.next.value, None)
-                                                return Attack(None, [nodeIden, dmgType, nodeInt, nodeIden2])
+                                                return Attack(None, [nodeInt, nodeIden2])
                                             else:
                                                 raise Exception('Expected IDEN')
                                         else:
@@ -636,7 +629,7 @@ class Parser:
             return NoOp(None, [])
         
         else:
-            raise Exception('Expected FUNCTION or GAME_LOOP or CONDITIONAL or ACTION or RETURN or while or if or NEWLINE')
+            raise Exception('Expected ENTITIES or IDEN or GAME_LOOP_START or IF or ACTION or RETURN or BEGIN or NEWLINE')
         
     def run(code):
         code = PrePro.filter(code)
