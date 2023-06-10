@@ -1,16 +1,16 @@
 souls
 player:hollowknight lives
-enemy:aspid lives
+enemy:hopper lives
 eaten
-if aspid lifeislessthan 21
-    begin hollowknight uses purenail causes playerdmg being 1 to aspid    
-empty
-interaction:life_condition teste1 entities enemy:enemy1, player:player1 
+interaction:life_condition ataque1 entities enemy:enemy1, player:player1 
 purevessel
-    usingsoul 20
+    usingsoul 10
+        if enemy1 lifeislessthan 10
+            begin player1 uses purenail causes playerdmg being 1 to enemy1    
+        empty
         begin player1 uses purenail causes playerdmg being 1 to enemy1
         5
     endusingsoul
     return enemy1
 sealedvessel
-action teste1 entities aspid, hollowknight done
+action ataque1 entities hopper, hollowknight done
