@@ -3,19 +3,26 @@ from parserling import Parser
 from rply.errors import ParsingError
 
 text = """
-Hollownest is infected
 souls to be sacrificed
-npc:npc1 lives as Iselda
-npc:npc2 lives as Cornifer
-player:hollowknight lives as HollowKnight
-boss:boss1 lives as FalseKnight
-enemy:enemy1 lives as Aspid
-enemy:enemy2 lives as Boulder
+player:hollowknight lives
+boss:boss1 lives
+enemy:enemy1 lives
+enemy:enemy2 lives
 they became the void
-full soul
-purenail causes playerdmg being 21 to enemy_entity & if enemy1 life is less than 21 results in dead
+if enemy1 life is less than 21
+    begin hollowknight uses purenail causes playerdmg being 21 to enemy1    
 empty soul
-You became the void
+interaction teste1 entities enemy:enemy1, player:hollowknight 
+pure vessel
+    using soul 20
+        begin hollowknight uses purenail causes playerdmg being 21 to enemy1
+        begin hollowknight uses howlingwraiths causes upspelldmg being 15 to enemy1
+        begin hollowknight uses desolatedive causes downspelldmg being 15 to enemy1
+        5
+    end using soul
+    return enemy1
+sealed vessel
+action teste1 entities enemy1, hollowknight done
 """
 
 
